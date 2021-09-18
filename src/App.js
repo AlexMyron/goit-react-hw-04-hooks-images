@@ -24,6 +24,11 @@ const App = () => {
     });
   });
 
+  useEffect(() => {
+    if (searchInput === "") return;
+    fetchRequest(searchInput, currentPage);
+  }, [searchInput, currentPage]);
+
   const getImageUrl = (imageId) => {
     const targetImage = apiResult.find((image) => {
       return image.id === imageId;
@@ -51,17 +56,13 @@ const App = () => {
   };
 
   const handleSearchinput = (searchInput) => {
-    setSearchInput(searchInput);
-
-    setCurrentPage(1);
     setApiResult([]);
-    fetchRequest(searchInput, currentPage);
+    setCurrentPage(1);
+    setSearchInput(searchInput);
   };
 
   const handleLoadMore = (e) => {
     setCurrentPage((state) => state + 1);
-
-    fetchRequest(searchInput, currentPage + 1);
   };
 
   const toggleModal = () => {

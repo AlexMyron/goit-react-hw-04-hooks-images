@@ -1,4 +1,4 @@
-const fetchImages = (query, page) => {
+const fetchImages = (query, page = 1) => {
   return fetch(`https://pixabay.com/api/?q=${query}&page=${page}&key=22046149-41a2515b5a783e6a5f4bfbfcc&image_type=photo&orientation=horizontal&per_page=12
 `).then((res) => {
     if (res.ok) {
