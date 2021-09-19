@@ -22,7 +22,8 @@ const App = () => {
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
-  });
+    console.log(currentPage);
+  }, [currentPage]);
 
   useEffect(() => {
     if (searchInput === "") return;
