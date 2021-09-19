@@ -4,14 +4,10 @@ import { GalleryItemStyles, GalleryItemImg } from "./ImageGalleryItem.styled";
 const ImageGalleryItem = ({ queryResult }) => {
   return (
     <>
-      {queryResult.map((image) => {
+      {queryResult.map(({ id, webformatURL, tags }) => {
         return (
-          <GalleryItemStyles key={image.id}>
-            <GalleryItemImg
-              src={image.webformatURL}
-              alt={image.tags}
-              data-id={image.id}
-            />
+          <GalleryItemStyles key={id}>
+            <GalleryItemImg src={webformatURL} alt={tags} data-id={id} />
           </GalleryItemStyles>
         );
       })}

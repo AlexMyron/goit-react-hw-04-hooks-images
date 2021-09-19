@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Loader from "react-loader-spinner";
+import toast, { Toaster } from "react-hot-toast";
 import "./App.css";
 import Searchbar from "./components/Searchbar";
 import ImageGallery from "./components/ImageGallery";
@@ -16,19 +17,36 @@ const App = () => {
   const [openModal, setOpenModal] = useState(false);
   const [loader, setLoader] = useState(false);
   const [currentImageURL, setCurrentImageURL] = useState("");
-
-  useEffect(() => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: "smooth",
-    });
-    console.log(currentPage);
-  }, [currentPage]);
+  const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
     if (searchInput === "") return;
+
+    const fetchRequest = (query, page) => {
+      setLoader(true);
+
+      fetchImages(query, page)
+        .then((data) =>
+          setApiResult((state) => {
+            if (data.totalHits === 0) setShowMessage(true);
+            return [...state, ...data.hits];
+          })
+        )
+        .catch((error) => setError(error))
+        .finally(() => setLoader(false));
+    };
+
     fetchRequest(searchInput, currentPage);
   }, [searchInput, currentPage]);
+
+  useEffect(() => {
+    if (apiResult.length !== 12 && apiResult.length !== 0) return scrollPage();
+  }, [apiResult]);
+
+  useEffect(() => {
+    errorMessage(showMessage);
+    setShowMessage(false);
+  }, [showMessage]);
 
   const getImageUrl = (imageId) => {
     const targetImage = apiResult.find((image) => {
@@ -39,6 +57,15 @@ const App = () => {
     return targetImage.largeImageURL;
   };
 
+  const errorMessage = (isShow) => {
+    if (isShow) {
+      return toast.error("No such photos or images found", {
+        position: "top-right",
+        duration: 2000,
+      });
+    }
+  };
+
   const showModal = (e) => {
     if (e.target.nodeName !== "IMG") return;
     const imageId = Number(e.target.dataset.id);
@@ -47,23 +74,21 @@ const App = () => {
     setOpenModal(true);
   };
 
-  const fetchRequest = (query, page) => {
-    setLoader(true);
-
-    fetchImages(query, page)
-      .then((data) => setApiResult((state) => [...state, ...data.hits]))
-      .catch((error) => setError(error))
-      .finally(() => setLoader(false));
-  };
-
   const handleSearchinput = (searchInput) => {
     setApiResult([]);
     setCurrentPage(1);
     setSearchInput(searchInput);
   };
 
-  const handleLoadMore = (e) => {
+  const handleLoadMore = async (e) => {
     setCurrentPage((state) => state + 1);
+  };
+
+  const scrollPage = () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight * 3,
+      behavior: "smooth",
+    });
   };
 
   const toggleModal = () => {
@@ -99,6 +124,7 @@ const App = () => {
       )}
       {error && <p>Woops... {error.message}</p>}
       {isApiResult && <LoadMoreBtn handleClick={handleLoadMore} />}
+      <Toaster />
     </AppWrapper>
   );
 };
