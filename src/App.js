@@ -17,6 +17,7 @@ const App = () => {
   const [openModal, setOpenModal] = useState(false);
   const [loader, setLoader] = useState(false);
   const [currentImageURL, setCurrentImageURL] = useState("");
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
 
   useEffect(() => {
@@ -28,7 +29,9 @@ const App = () => {
       fetchImages(query, page)
         .then((data) =>
           setApiResult((state) => {
-            if (data.totalHits === 0) setShowMessage(true);
+            if (data.totalHits === 0) setShowErrorMessage(true);
+            if (data.totalHits !== 0 && data.hits.length === 0)
+              setShowErrorMessage(true);
             return [...state, ...data.hits];
           })
         )
@@ -44,7 +47,15 @@ const App = () => {
   }, [apiResult]);
 
   useEffect(() => {
-    errorMessage(showMessage);
+    errorMessage(showErrorMessage);
+    setShowErrorMessage(false);
+  }, [showErrorMessage]);
+
+  useEffect(() => {
+    toast("No more images found", {
+      position: "top-right",
+      duration: 2000,
+    });
     setShowMessage(false);
   }, [showMessage]);
 
