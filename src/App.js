@@ -31,7 +31,9 @@ const App = () => {
           setApiResult((state) => {
             if (data.totalHits === 0) setShowErrorMessage(true);
             if (data.totalHits !== 0 && data.hits.length === 0)
-              setShowErrorMessage(true);
+              setShowMessage(true);
+            console.log("object");
+
             return [...state, ...data.hits];
           })
         )
@@ -52,10 +54,11 @@ const App = () => {
   }, [showErrorMessage]);
 
   useEffect(() => {
-    toast("No more images found", {
-      position: "top-right",
-      duration: 2000,
-    });
+    if (showMessage) {
+      toast("No more images found", {
+        position: "top-right",
+      });
+    }
     setShowMessage(false);
   }, [showMessage]);
 
